@@ -32,10 +32,10 @@ AtB = Trans(trans_X,trans_Y,trans_Z) * RotZ(theta) %#ok<NOPTS>
 disp("Exercice 2b: Point P1(3,7,0) from Referential B to A (implies inverse calcualtion)");
 Bp1 = [3.0 7.0 0.0]';
 
-ArB = AtB(1:3,1:3);
-ArBt = ArB';
-ApOB = AtB(1:3,4:4);
-BpOA = - ArBt * ApOB;
+ArB = AtB(1:3,1:3);                     % get the non homegeneous matrix 
+ArBt = ArB';                            % transpose it
+ApOB = AtB(1:3,4:4);                    % get the origin vector/point on A referential
+BpOA = - ArBt * ApOB;                   % origin vector/point on B referential
 
 BtA = [ArBt,BpOA;[0 0 0 1]];
 Ap1 = BtA * [Bp1;1] %#ok<NOPTS>
