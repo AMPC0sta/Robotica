@@ -1,7 +1,7 @@
 theta = deg2rad(30);
 
 % Answer to 1.a)
-disp('Transformation Matrix from Coordinates System A to Coordinates System B');
+disp('Exercice 1.a: Transformation Matrix from Coordinates System A to Coordinates System B');
 AtB = [ 
         [1 0 0 0];
         [0 cos(theta) -sin(theta) 0];
@@ -19,7 +19,7 @@ ArB = [
 ArBt = ArB';
 BpOA = -ArBt * ApOB;
 
-disp('Transformation Inverted Matrix from Coordinates System B to Coordinates System A');
+disp('Exercice 1.b: Transformation Inverted Matrix from Coordinates System B to Coordinates System A');
 BtA =  [ArBt,BpOA;[0 0 0 1]]
 
 Bp = [0.0 1.5 0.0]';
