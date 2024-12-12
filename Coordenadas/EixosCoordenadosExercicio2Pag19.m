@@ -26,7 +26,8 @@ Trans = @(x,y,z) [
 
 
 disp("Exercice 2a: Transformation Matrix from A to B");
-AtB = Trans(trans_X,trans_Y,trans_Z) * RotZ(theta) %#ok<NOPTS>
+AtB = Trans(trans_X,trans_Y,trans_Z) * RotZ(theta);
+disp(AtB);
 
 
 disp("Exercice 2b: Point P1(3,7,0) from Referential B to A (implies inverse calcualtion)");
@@ -38,6 +39,21 @@ ApOB = AtB(1:3,4:4);                    % get the origin vector/point on A refer
 BpOA = - ArBt * ApOB;                   % origin vector/point on B referential
 
 BtA = [ArBt,BpOA;[0 0 0 1]];
-Ap1 = BtA * [Bp1;1] %#ok<NOPTS>
+Ap1 = BtA * [Bp1;1];
+disp(Ap1);
+
 disp("Exercice 2b: Checking if transformations matrices are injective");
-New_Bp1 = AtB * Ap1 %#ok<NOPTS>
+New_Bp1 = AtB * Ap1;
+disp(New_Bp1);
+
+disp("Exercice 2c: Inverse matrix of BtA (resulted matrix must match 2a result)");
+BrA = BtA(1:3,1:3);
+BrAt = BrA';
+New_BpOA = BtA(1:3,4:4);
+New_ApOB = - BrAt * New_BpOA;
+New_AtB = [BrAt,New_ApOB;[0 0 0 1]];
+disp(New_AtB);
+
+disp("Exercice 2d: Ordering transformation operations in a different way will result in a different matrix");
+AtB_reordered =  RotZ(theta) * Trans(trans_X,trans_Y,trans_Z);
+disp(AtB_reordered);
