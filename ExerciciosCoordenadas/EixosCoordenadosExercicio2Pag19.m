@@ -39,11 +39,11 @@ ApOB = AtB(1:3,4:4);                    % get the origin vector/point on A refer
 BpOA = - ArBt * ApOB;                   % origin vector/point on B referential
 
 BtA = [ArBt,BpOA;[0 0 0 1]];
-Ap1 = BtA * [Bp1;1];
+Ap1 = AtB * [Bp1;1];
 disp(Ap1);
 
 disp("Exercice 2b: Checking if transformations matrices are injective");
-New_Bp1 = AtB * Ap1;
+New_Bp1 = BtA * Ap1;
 disp(New_Bp1);
 
 disp("Exercice 2c: Inverse matrix of BtA (resulted matrix must match 2a result)");

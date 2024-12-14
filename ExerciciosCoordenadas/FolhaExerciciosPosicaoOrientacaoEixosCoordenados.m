@@ -47,3 +47,13 @@ Bp2 = AtB * [Ap2;1];
 
 disp("Exercice 2d: Point P2 in referential B");
 disp(Bp2);
+
+% Exercicio 3) resolvido em EixosCoordenadosExercicio2Pag19.m (2.d)
+
+% Exercicio 4) 
+
+% Dois sistemas de coordenadas {A} e {B} coincidentes/sobrepostos.
+% Operações sobre {B}:
+%      1ª RotY(theta)  -> sobre Ya ou Yb
+%      2ª RotZ(phi)    -Z sobre o novo Zb
+
