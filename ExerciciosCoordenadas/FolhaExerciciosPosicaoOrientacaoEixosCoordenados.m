@@ -124,3 +124,32 @@ disp(Ap);
 disp('Checking if it goes backward to the original point');
 New_Bp = BtA * Ap;
 disp(New_Bp);
+
+
+% Exercicio 6) 
+% Considering the homogeneous matrices
+
+disp('Exercice 6a) not solved in here');
+disp();
+disp('Exercice 6b) not solved in here');
+
+AtB =   [
+            [0.866  -0.5    0       11];
+            [0.5    0.866   0       -1];
+            [0      0       1       8];
+            [0      0       0       1]
+        ];
+
+CtB =   [
+            [1      0       0       11];
+            [0      0.866   -0.5    10];
+            [0      0.5     0.866   -20];
+            [0      0       0       1]
+        ];
+
+DtA =   [
+            [0.866  -0.5    0       -3];
+            [0.433  0.75    -0.5    -3];
+            [0.25   0.433   0.866   3];
+            [0      0       0       1]
+        ];
