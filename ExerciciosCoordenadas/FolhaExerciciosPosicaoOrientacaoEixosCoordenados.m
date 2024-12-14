@@ -82,4 +82,4 @@ syms theta phi;
 
 % multiplying matrices in post order multiplication. 
 ArB = RotY(theta) * RotZ(phi);
-disp(ArB);
+disp(ArB(1:3,1:3));
