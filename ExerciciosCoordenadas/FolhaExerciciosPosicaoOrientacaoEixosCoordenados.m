@@ -82,4 +82,45 @@ syms theta phi;
 
 % multiplying matrices in post order multiplication. 
 ArB = RotY(theta) * RotZ(phi);
+disp('Exercice 4): resulted transformation matrix')
 disp(ArB(1:3,1:3));
+
+
+% Exercicio 5) 
+% Considering the homogeneous matrix
+
+syms thta;      % to be worked as symbolic
+
+funcBtA = @(thta)  [
+                    [1  0           0           1];
+                    [0  cos(thta)   -sin(thta)  2];
+                    [0  sin(thta)   cos(thta)   3];
+                    [0  0           0           1]
+               ];
+
+disp('Exercice 5a) Resultant transformation matrix');
+BtA = funcBtA(thta);
+BrA = BtA(1:3,1:3);             % Non homogeneouns transformation matrix
+BrAt = BrA';                    % Transposing it
+BoAP = BtA(1:3,4:4);
+AoBP = - BrAt * BoAP;
+AtB = [BrAt,AoBP;[0 0 0 1]];
+disp(AtB);
+
+disp('Exercice 5b) Resultant transformation matrix, if theta 45 and Ap = [4 5 6]');
+
+thta = deg2rad(45);
+Bp = [4 5 6]';
+
+BtA = funcBtA(deg2rad(thta));
+BrA = BtA(1:3,1:3);             % Non homogeneouns transformation matrix
+BrAt = BrA';                    % Transposing it
+BoAP = BtA(1:3,4:4);
+AoBP = - BrAt * BoAP;
+AtB = [BrAt,AoBP;[0 0 0 1]];
+
+Ap = AtB * [Bp;1];
+disp(Ap);
+disp('Checking if it goes backward to the original point');
+New_Bp = BtA * Ap;
+disp(New_Bp);
