@@ -128,6 +128,7 @@ disp(New_Bp);
 
 % Exercicio 6) 
 % Considering the homogeneous matrices
+% File exec-6-approach-draft.pdf helps to solve exercise 6.b
 
 disp('Exercice 6a) not solved in here');
 disp();
