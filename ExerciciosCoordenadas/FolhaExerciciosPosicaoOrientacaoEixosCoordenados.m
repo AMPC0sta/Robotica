@@ -57,3 +57,29 @@ disp(Bp2);
 %      1ª RotY(theta)  -> sobre Ya ou Yb
 %      2ª RotZ(phi)    -Z sobre o novo Zb
 
+% Porque as operções, não são relativas ao referencial base ( a sequencia de transformaçoes tera uma ordem diferente.)
+
+% ArB = RotY(theta) * RotZ(phi)
+
+% anonymous functions, can be called inside this very script
+% for rotation
+RotZ = @(x) [ 
+                [1 0 0 0];
+                [0 cos(x) -sin(x) 0];
+                [0 sin(x)  cos(x) 0]; 
+                [0 0 0 1] 
+            ];
+
+RotY = @(x) [
+               [ cos(x) 0 sin(x) 0];
+               [ 0 1 0 0];
+               [-sin(x) 0 cos(x) 0];
+               [ 0 0 0 1]
+            ];
+
+% since there's no assigned value for angles theta and  phi they will worked as symbols.
+syms theta phi;
+
+% multiplying matrices in post order multiplication. 
+ArB = RotY(theta) * RotZ(phi);
+disp(ArB);
