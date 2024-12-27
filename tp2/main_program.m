@@ -146,6 +146,27 @@ end
 itarget=TARGET1;          %initialize first target
 start = tic;
 iteration = 0;
+
+% Initializations out of loop:
+vrobot_x = 50;
+vrobot_y = 0;
+wrobot = 0;
+
+%dt = sim.get_simulation_time();
+    
+dt = 0.05;
+tau_tar = 15 * dt;          % computation cycle, constant  will  change force magnitude
+lambda_tar = 1 / tau_tar;   % atractor lamda
+Q = 0.05;                   % base for gaussian noise
+
+
+[~,rob_W,rob_L,theta_obs] = vehicle.get_RobotCharacteristics();
+
+%beta_1 = 1/15*dt;
+beta_1 = 150;
+beta_2 = 30;
+
+
 %%%---------------------- Start Robot Motion Behavior -------------------
 while itarget<=sim.TARGET_Number % until robot goes to last target
     %% Robot interface
@@ -269,85 +290,63 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     %    return;
     %end
 
-    %vrobot_x = 50
-    %vrobot_y = 0
-    %wrobot = 0
-
-    %dt = sim.get_simulation_time()
     
-    % %pause;  
-    % disp("1");
-    % 
-    % 
-    % dt = 0.05;
-    % tau_tar = 5 * dt;          % computation cycle, constant  will  change force magnitude
-    % lambda_tar = 1 / tau_tar;   % atractor lamda
-    % Q = 0.05;                   % base for gaussian noise
-    % 
-    % [~,XTARGET,YTARGET] = sim.get_TargetPosition(TARGET1);
-    % psi_tar = atan2 ((YTARGET - y),(XTARGET - x));
-    % 
-    % 
-    % %f_tar = - lambda_tar * sin(phi - psi_tar);
-    % f_tar = target_aquisition(phi,psi_tar,lambda_tar);
-    % 
-    % %[~,rob_W,rob_L,theta_obs] = vehicle.get_RobotCharacteristics();
-    % 
-    % %beta_1 = 1/15*dt;
-    % beta_1 = 5;
-    % beta_2 = 25;
-    % delta_theta = theta_obs(2) - theta_obs(1); %sector width in radians
-    % %[~,dist] = vehicle.get_DistanceSensorAquisition(true, false);
-    % 
-    % f_obs = obstacle_avoidance(delta_theta,theta_obs,beta_1,beta_2,dist,rob_L,rob_W);
-    % 
-    % %pause;  
-    % disp("2");
-    % 
-    % f_stoch = sqrt(Q) * randn(1,1);     % randn returns a 1x1 matrix with probility around a guassian distribution
-    % 
-    % f_total = f_obs + f_tar + f_stoch;
-    % [f_total,f_tar,f_obs,f_stoch,dt,iteration]
-    % wrobot = f_total;
-    % 
-    % vrobot_y = 0;
-    % vrobot_x = 50;              % linear speed cm/s
-    % 
-    % %[~,v1,v2,v3,v4] = vehicle.Kinematics_vehicle(wrobot,vrobot_y,vrobot_x);
-    % %[error,x, y, phi] = vehicle.set_velocity(v1,v2,v3,v4);
-    % 
-    % %pause;  
-    % disp("3");
-    % 
-    % graphic_dynamics_view = 0;
-    % if graphic_dynamics_view == 1        
-    %         phi_range = linspace(-2*pi,2*pi,25);
-    %         f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
-    %         f_obs_1 = obstacle_avoidance_with_phi(phi_range,delta_theta,theta_obs,beta_1,beta_2,dist,rob_W,rob_L);
-    %         f_t = f_obs_1 + f_tar_1 + f_stoch;
-    %         plot(phi_range,f_t, 'b', 'LineWidth', 2);
-    %         hold on
-    %             %plot(phi, f_obs +  target_aquisition(phi,psi_tar,lambda_tar) + f_stoch, 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r'); % Red point
-    %             xline(phi, '--b', 'LineWidth', 2); % Creates a vertical line at each value in phi, in red color
-    %             plot(phi_range,f_tar_1, 'g', 'LineWidth', 2);
-    %             plot(phi_range,f_obs_1, 'r', 'LineWidth', 2);
-    %         hold off
-    %         ylim([-50,25]);
-    %         % Add labels and title
-    %         xlabel('Phi (radians)');
-    %         ylabel('f_{tar} (Value)');
-    %         title('Robot Motion Navigation Dynamics');
-    % 
-    %         lgd = legend("Total Force without stochastic force", "-- Current phi angle","Target Acquisition contribution", "Obstacle avoidance contribution");
-    % 
-    %         % Set colors for each legend entry
-    %         lgd.TextColor = 'black';  % Set a default color for all entries if desired
-    % 
-    %         % Adjust individual colors (MATLAB does not natively support different colors in a single legend, 
-    %         % but you can create custom colored legend icons if needed)
-    %         lgd.String = {'\color{blue} Total Force without stochastic force','\color{blue} Current phi angle', '\color{green} Target Acquisition contribution','\color{red} Obstacle avoidance contribution'};
-    % 
-    % end
+
+
+ 
+    [~,XTARGET,YTARGET] = sim.get_TargetPosition(TARGET1);
+    psi_tar = atan2 ((YTARGET - y),(XTARGET - x));
+    
+    
+    %f_tar = - lambda_tar * sin(phi - psi_tar);
+    f_tar = target_aquisition(phi,psi_tar,lambda_tar);
+        
+
+    delta_theta = theta_obs(2) - theta_obs(1); %sector width in radians
+    %[~,dist] = vehicle.get_DistanceSensorAquisition(true, false);
+    
+    f_obs = obstacle_avoidance(delta_theta,theta_obs,beta_1,beta_2,dist,rob_L,rob_W);
+    
+    f_stoch = sqrt(Q) * randn(1,1);     % randn returns a 1x1 matrix with probility around a guassian distribution
+    
+    f_total = f_obs + f_tar + f_stoch;
+    
+    wrobot = f_total;
+    
+    %[~,v1,v2,v3,v4] = vehicle.Kinematics_vehicle(wrobot,vrobot_y,vrobot_x);
+    %[error,x, y, phi] = vehicle.set_velocity(v1,v2,v3,v4);
+    
+    graphic_dynamics_view = 0;
+    if graphic_dynamics_view == 1        
+            phi_range = linspace(-2*pi,2*pi,25);
+            f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
+            f_obs_1 = obstacle_avoidance_with_phi(phi_range,delta_theta,theta_obs,beta_1,beta_2,dist,rob_W,rob_L);
+            f_t = f_obs_1 + f_tar_1 + f_stoch;
+            plot(phi_range,f_t, 'b', 'LineWidth', 2);
+            hold on
+                %plot(phi, f_obs +  target_aquisition(phi,psi_tar,lambda_tar) + f_stoch, 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r'); % Red point
+                xline(phi, '--b', 'LineWidth', 2); % Creates a vertical line at each value in phi, in red color
+                plot(phi_range,f_tar_1, 'g', 'LineWidth', 2);
+                plot(phi_range,f_obs_1, 'r', 'LineWidth', 2);
+            hold off
+            ylim([-50,25]);
+            % Add labels and title
+            xlabel('Phi (radians)');
+            ylabel('f_{tar} (Value)');
+            title('Robot Motion Navigation Dynamics');
+    
+            lgd = legend("Total Force without stochastic force", "-- Current phi angle","Target Acquisition contribution", "Obstacle avoidance contribution");
+    
+            % Set colors for each legend entry
+            lgd.TextColor = 'black';  % Set a default color for all entries if desired
+    
+            % Adjust individual colors (MATLAB does not natively support different colors in a single legend, 
+            % but you can create custom colored legend icons if needed)
+            lgd.String = {'\color{blue} Total Force without stochastic force','\color{blue} Current phi angle', '\color{green} Target Acquisition contribution','\color{red} Obstacle avoidance contribution'};
+    
+    end 
+
+
     %%------------- END OF YOUR CODE -------------
     
     %%----------------------------------------------------------------------
