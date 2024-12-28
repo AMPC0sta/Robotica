@@ -148,7 +148,7 @@ start = tic;
 iteration = 0;
 
 % Initializations out of loop:
-vrobot_x = 50;
+vrobot_x = 100;
 vrobot_y = 0;
 wrobot = 0;
 
@@ -166,8 +166,13 @@ Q = 0.05;                   % base for gaussian noise
 beta_1 = 50;
 beta_2 = 30;
 
-disp(Links);
+itarget = BOX;
 
+L1 = Links(1)*10;
+disp(L1);
+disp(Links);
+disp(MinPositionJoint);
+disp(MaxPositionJoint);
 
 %%%---------------------- Start Robot Motion Behavior -------------------
 while itarget<=sim.TARGET_Number % until robot goes to last target
@@ -307,12 +312,15 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     delta_theta = theta_obs(2) - theta_obs(1); %sector width in radians
     %[~,dist] = vehicle.get_DistanceSensorAquisition(true, false);
     f_obs = obstacle_avoidance(delta_theta,theta_obs,beta_1,beta_2,dist,rob_L,rob_W);
-    f_stoch = sqrt(Q) * randn(1,1);     % randn returns a 1x1 matrix with probility around a guassian distribution
+    f_stoch = sqrt(Q) * randn(1,1);     % randn returns a 1x1 matrix with probability around a guassian distribution
     f_total = f_obs + f_tar + f_stoch;
     wrobot = f_total;
     
-    if distance_robot_2_target < 60 
+    if distance_robot_2_target < 50 
         vrobot_x = 0;
+        armJoints(1) = pi; % X, Y Orientation is set by robot rotation from the target aquisition equation
+        error = vehicle.set_joints(armJoints); % in rad
+ 
     end
     
     
