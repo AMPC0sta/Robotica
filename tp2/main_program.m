@@ -298,7 +298,9 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
  
     [~,XTARGET,YTARGET] = sim.get_TargetPosition(TARGET1);
     psi_tar = atan2 ((YTARGET - y),(XTARGET - x));
-    
+
+    distance_robot_2_target = sqrt((XTARGET-x)^2+(YTARGET-y)^2);
+    disp(distance_robot_2_target);
     
     %f_tar = - lambda_tar * sin(phi - psi_tar);
     f_tar = target_aquisition(phi,psi_tar,lambda_tar);
