@@ -300,25 +300,21 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     psi_tar = atan2 ((YTARGET - y),(XTARGET - x));
 
     distance_robot_2_target = sqrt((XTARGET-x)^2+(YTARGET-y)^2);
-    disp(distance_robot_2_target);
-    
+
     %f_tar = - lambda_tar * sin(phi - psi_tar);
     f_tar = target_aquisition(phi,psi_tar,lambda_tar);
         
-
     delta_theta = theta_obs(2) - theta_obs(1); %sector width in radians
     %[~,dist] = vehicle.get_DistanceSensorAquisition(true, false);
-    
     f_obs = obstacle_avoidance(delta_theta,theta_obs,beta_1,beta_2,dist,rob_L,rob_W);
-    
     f_stoch = sqrt(Q) * randn(1,1);     % randn returns a 1x1 matrix with probility around a guassian distribution
-    
     f_total = f_obs + f_tar + f_stoch;
-    
     wrobot = f_total;
     
-    %[~,v1,v2,v3,v4] = vehicle.Kinematics_vehicle(wrobot,vrobot_y,vrobot_x);
-    %[error,x, y, phi] = vehicle.set_velocity(v1,v2,v3,v4);
+    if distance_robot_2_target < 40 
+        vrobot_x = 0;
+    end
+    
     
     graphic_dynamics_view = 0;
     if graphic_dynamics_view == 1        
