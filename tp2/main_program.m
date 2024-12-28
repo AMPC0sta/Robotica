@@ -311,7 +311,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     f_total = f_obs + f_tar + f_stoch;
     wrobot = f_total;
     
-    if distance_robot_2_target < 40 
+    if distance_robot_2_target < 60 
         vrobot_x = 0;
     end
     
