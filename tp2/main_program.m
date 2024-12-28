@@ -155,16 +155,18 @@ wrobot = 0;
 %dt = sim.get_simulation_time();
     
 dt = 0.05;
-tau_tar = 15 * dt;          % computation cycle, constant  will  change force magnitude
+tau_tar = 5 * dt;          % computation cycle, constant  will  change force magnitude
 lambda_tar = 1 / tau_tar;   % atractor lamda
 Q = 0.05;                   % base for gaussian noise
 
 
 [~,rob_W,rob_L,theta_obs] = vehicle.get_RobotCharacteristics();
 
-%beta_1 = 1/15*dt;
-beta_1 = 150;
+%beta_1 = 1/lambda_tar;
+beta_1 = 50;
 beta_2 = 30;
+
+disp(Links);
 
 
 %%%---------------------- Start Robot Motion Behavior -------------------
@@ -320,16 +322,22 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     if graphic_dynamics_view == 1        
             phi_range = linspace(-2*pi,2*pi,25);
             f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
+           
             f_obs_1 = obstacle_avoidance_with_phi(phi_range,delta_theta,theta_obs,beta_1,beta_2,dist,rob_W,rob_L);
+           
             f_t = f_obs_1 + f_tar_1 + f_stoch;
+            ylim([-10,45]);
+
+            
             plot(phi_range,f_t, 'b', 'LineWidth', 2);
+            %plot(phi_range,f_t, 'b',phi_range,f_tar_1, 'g', phi_range,f_obs_1, 'r', 'LineWidth', 2);
             hold on
                 %plot(phi, f_obs +  target_aquisition(phi,psi_tar,lambda_tar) + f_stoch, 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r'); % Red point
                 xline(phi, '--b', 'LineWidth', 2); % Creates a vertical line at each value in phi, in red color
                 plot(phi_range,f_tar_1, 'g', 'LineWidth', 2);
                 plot(phi_range,f_obs_1, 'r', 'LineWidth', 2);
             hold off
-            ylim([-50,25]);
+            
             % Add labels and title
             xlabel('Phi (radians)');
             ylabel('f_{tar} (Value)');
