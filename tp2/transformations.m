@@ -2,7 +2,7 @@ function trfs = transformations()
     % This wrapper function returns handles to the individual functions
     trfs.from_world_to_kuka_matrix = @from_world_to_kuka_matrix;
     trfs.from_kuka_center_to_arm_matrix = @from_kuka_center_to_arm_matrix;
-    trfs.from_world_to_arm_base_matrix = @from_world_to_arm_base_matrix
+    trfs.from_world_to_arm_base_matrix = @from_world_to_arm_base_matrix;
     
 end
 

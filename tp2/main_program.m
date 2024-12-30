@@ -174,6 +174,8 @@ disp(Links);
 disp(MinPositionJoint);
 disp(MaxPositionJoint);
 
+referentials = transformations();
+
 %%%---------------------- Start Robot Motion Behavior -------------------
 while itarget<=sim.TARGET_Number % until robot goes to last target
     %% Robot interface
