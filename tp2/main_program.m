@@ -322,7 +322,11 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         vrobot_x = 0;
         armJoints(1) = pi; % X, Y Orientation is set by robot rotation from the target aquisition equation
         error = vehicle.set_joints(armJoints); % in rad
- 
+
+        arm_ref_matrix = referentials.from_world_to_arm_base_matrix([x-XTARGET,y-YTARGET,0],phi,Links(1)*10);
+        disp(arm_ref_matrix);
+        target_in_arm = arm_ref_matrix * [XTARGET;YTARGET;0;1];
+        disp(target_in_arm);
     end
     
     
