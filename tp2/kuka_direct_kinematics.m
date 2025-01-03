@@ -1,11 +1,15 @@
-function R = kuka_direct_kinematics(theta_1, theta_2, theta_3, Links)
-    L0 = Links(1);      % center to arm
-    L1 = Links(2);      % center to arm
-    L2 = Links(3);      % center to arm
-    L3 = Links(4);      % center to arm
-    theta_0 = 0;
+function [R] = kuka_direct_kinematics(arm_position, L)
 
-    x = L0*cos(theta_0) + L1*cos(theta_0 + theta_1) + L2*cos(theta_0 + theta_1 + theta_2) + L3*cos(theta_0 + theta_1 + theta_2 + theta_3);
-    z = L0*sin(theta_0) + L1*sin(theta_0 + theta_1) + L2*sin(theta_0 + theta_1 + theta_2) + L3*sin(theta_0 + theta_1 + theta_2 + theta_3);
+    % inputs:
+    % qinput=[theta1 theta2 theta3] - vetor with the joint values (rad)
+    % L=[L1 L2 L3] - vector with the two links lenghts (mm)
+    % output:
+    % R=[xe ye] - vetor with desired values for the end-effector position
+    q = [pi/2 - arm_position(1),arm_position(2),arm_position(3)]; %Joint J1 is vertical, so that angle affects to Y axis instead of X, do this, we shift the quadrant
     
-    R = [x,z];
+    
+    xe=L(1)*cos(q(1))+L(2)*cos(q(1)+q(2))+L(3)*cos(q(1)+q(2)+q(3));
+    ye=L(1)*sin(q(1))+L(2)*sin(q(1)+q(2))+L(3)*sin(q(1)+q(2)+q(3));
+                                              
+    R=[xe ye]';                                           
+end    

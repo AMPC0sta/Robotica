@@ -66,6 +66,7 @@ armJoints(2)=30*pi/180;
 armJoints(3)=50*pi/180;
 armJoints(4)=70*pi/180;
 armJoints(5)=0*pi/180;
+
 %This function send value for arm Joints in rad
 error = vehicle.set_joints(armJoints); % in rad
 %Input
@@ -143,7 +144,7 @@ if(error==1)
     return;
 end
 
-itarget=TARGET1;          %initialize first target
+itarget=BOX;          %initialize first target
 start = tic;
 iteration = 0;
 
@@ -166,15 +167,29 @@ Q = 0.05;                   % base for gaussian noise
 beta_1 = 50;
 beta_2 = 30;
 
-itarget = BOX;
+itarget = TARGET1;
+ZTARGET = 2;
 
-L1 = Links(1)*10;
-disp(L1);
+L = [Links(5)*100,Links(6)*100,(Links(7)+Links(8))*100];
+q_max = [MaxPositionJoint(2),MaxPositionJoint(3),MaxPositionJoint(4)];
+q_min = [MinPositionJoint(2),MinPositionJoint(3),MinPositionJoint(4)];
+
 disp(Links);
-disp(MinPositionJoint);
-disp(MaxPositionJoint);
+disp(L);
+disp(q_min);
+disp(q_max);
+
+TARGET_BOUNDARY_HIGH = 100 * (Links(5) + Links(6) + Links(7) + Links(8));
+TARGET_BOUNDARY_LOW = 10;
+
+MOVE = 1;
+GRASP = 2;
+PICK = 3;
+action = MOVE;
 
 referentials = transformations();
+
+addpath('D:\Projects\personal\Robotica\Robotica\experiments\');
 
 %%%---------------------- Start Robot Motion Behavior -------------------
 while itarget<=sim.TARGET_Number % until robot goes to last target
@@ -235,7 +250,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     end
 
     %Get target position for target 1 or 2 (itarget) or 3 for box
-    [error,XTARGET,YTARGET] = sim.get_TargetPosition(BOX);
+    [error,XTARGET,YTARGET] = sim.get_TargetPosition(itarget);
     %Input:
     %itarget - selection of target to get location (TARGET1,TARGET2,BOX)
     %Output:
@@ -303,31 +318,69 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
 
 
  
-    [~,XTARGET,YTARGET] = sim.get_TargetPosition(TARGET1);
-    psi_tar = atan2 ((YTARGET - y),(XTARGET - x));
+    if action == MOVE
+        [~,XTARGET,YTARGET] = sim.get_TargetPosition(itarget);
+        psi_tar = atan2 ((YTARGET - y),(XTARGET - x));
 
-    distance_robot_2_target = sqrt((XTARGET-x)^2+(YTARGET-y)^2);
+        distance_robot_2_target = sqrt((XTARGET-x)^2+(YTARGET-y)^2);
 
-    %f_tar = - lambda_tar * sin(phi - psi_tar);
-    f_tar = target_aquisition(phi,psi_tar,lambda_tar);
+        %f_tar = - lambda_tar * sin(phi - psi_tar);
+        f_tar = target_aquisition(phi,psi_tar,lambda_tar);
         
-    delta_theta = theta_obs(2) - theta_obs(1); %sector width in radians
-    %[~,dist] = vehicle.get_DistanceSensorAquisition(true, false);
-    f_obs = obstacle_avoidance(delta_theta,theta_obs,beta_1,beta_2,dist,rob_L,rob_W);
-    f_stoch = sqrt(Q) * randn(1,1);     % randn returns a 1x1 matrix with probability around a guassian distribution
-    f_total = f_obs + f_tar + f_stoch;
-    wrobot = f_total;
+        delta_theta = theta_obs(2) - theta_obs(1); %sector width in radians
+        %[~,dist] = vehicle.get_DistanceSensorAquisition(true, false);
+        f_obs = obstacle_avoidance(delta_theta,theta_obs,beta_1,beta_2,dist,rob_L,rob_W);
+        f_stoch = sqrt(Q) * randn(1,1);     % randn returns a 1x1 matrix with probability around a guassian distribution
+        f_total = f_obs + f_tar + f_stoch;
+        wrobot = f_total;
     
-    if distance_robot_2_target < 50 
-        vrobot_x = 0;
-        armJoints(1) = pi; % X, Y Orientation is set by robot rotation from the target aquisition equation
-        error = vehicle.set_joints(armJoints); % in rad
+        x_cm = x + 15.4*cos(phi);
+        y_cm = y + 15.4*sin(phi);
+        z_cm = 25.015;
+        alpha = 190*pi/180; 
+        distance_arm_target = sqrt((XTARGET-x_cm)^2 + (YTARGET-y_cm)^2);
 
-        arm_ref_matrix = referentials.from_world_to_arm_base_matrix([x-XTARGET,y-YTARGET,0],phi,Links(1)*10);
-        disp(arm_ref_matrix);
-        target_in_arm = arm_ref_matrix * [XTARGET;YTARGET;0;1];
-        disp(target_in_arm);
+    
+        if distance_arm_target > 10 && distance_arm_target < 60
+            vrobot_x = 20;
+            xed = sqrt( (XTARGET-x_cm)^2 + (YTARGET-y_cm)^2);
+            zed = ZTARGET-z_cm;
+
+            try
+                %[error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
+                [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
+            catch ME
+                disp(ME.message);
+                error = 1;
+            end 
+
+            if error == 0  && action == MOVE
+                action = GRASP;
+                vrobot_x = 0;
+                wrobot = 0;
+            end
+
+        end
     end
+
+
+    if action == GRASP
+        [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
+            theta0 = atan2((YTARGET - y_cm), (XTARGET - x_cm)) - phi;
+            armJoints(1) = theta0;
+            error = vehicle.set_joints(armJoints); % in rad  
+            j = vehicle.get_joints();
+            while abs(j(1) - theta0) > 0.1
+                abs(j(1) - theta0)
+                j = vehicle.get_joints();
+            end  
+
+            armJoints(2) = angles(1);
+            armJoints(3) = angles(2);
+            armJoints(4) = angles(3);
+            error = vehicle.set_joints(armJoints); % in rad  
+    end
+
     
     
     graphic_dynamics_view = 0;
