@@ -190,6 +190,7 @@ action = MOVE;
 
 
 addpath('D:\Projects\personal\Robotica\Robotica\tp2\arm_kinematics');
+addpath('D:\Projects\personal\Robotica\Robotica\tp2\navigation_dynamics');
 
 %%%---------------------- Start Robot Motion Behavior -------------------
 while itarget<=sim.TARGET_Number % until robot goes to last target
@@ -367,18 +368,19 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     if action == GRASP
         [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
             theta0 = atan2((YTARGET - y_cm), (XTARGET - x_cm)) - phi;
-            armJoints(1) = theta0+pi;
-            error = vehicle.set_joints(armJoints); % in rad  
-            j = vehicle.get_joints();
-            while abs(j(1) - (theta0+pi)) > 0.01
-                abs(j(1) - (theta0+pi))
-                j = vehicle.get_joints();
-            end  
 
-            armJoints(2) = angles(1);
-            armJoints(3) = angles(2);
-            armJoints(4) = angles(3);
+            th0 = theta0 + pi;
+            armJoints(1) = th0;
             error = vehicle.set_joints(armJoints); % in rad  
+  
+            j = vehicle.get_joints();
+
+            if abs(th0 - j(1)) <= 0.01
+                armJoints(2) = angles(1);
+                armJoints(3) = angles(2);
+                armJoints(4) = angles(3);
+                error = vehicle.set_joints(armJoints); % in rad  
+            end
     end
 
     
