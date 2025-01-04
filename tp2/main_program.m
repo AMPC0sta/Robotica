@@ -4,6 +4,7 @@
 %           Estela Bicho, estela.bicho@dei.uminho.pt
 %   % Copyright (C) 2023
 %   2023/10/31
+clear all;
 TARGET1 = 1;
 TARGET2 = 2;
 BOX = 3;
@@ -187,9 +188,8 @@ GRASP = 2;
 PICK = 3;
 action = MOVE;
 
-referentials = transformations();
 
-addpath('D:\Projects\personal\Robotica\Robotica\experiments\');
+addpath('D:\Projects\personal\Robotica\Robotica\tp2\arm_kinematics');
 
 %%%---------------------- Start Robot Motion Behavior -------------------
 while itarget<=sim.TARGET_Number % until robot goes to last target
@@ -367,11 +367,11 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     if action == GRASP
         [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
             theta0 = atan2((YTARGET - y_cm), (XTARGET - x_cm)) - phi;
-            armJoints(1) = theta0;
+            armJoints(1) = theta0+pi;
             error = vehicle.set_joints(armJoints); % in rad  
             j = vehicle.get_joints();
-            while abs(j(1) - theta0) > 0.1
-                abs(j(1) - theta0)
+            while abs(j(1) - (theta0+pi)) > 0.01
+                abs(j(1) - (theta0+pi))
                 j = vehicle.get_joints();
             end  
 
