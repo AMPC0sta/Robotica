@@ -4,7 +4,6 @@
 %           Estela Bicho, estela.bicho@dei.uminho.pt
 %   % Copyright (C) 2023
 %   2023/10/31
-clear all;
 TARGET1 = 1;
 TARGET2 = 2;
 BOX = 3;
@@ -158,15 +157,16 @@ wrobot = 0;
     
 dt = 0.05;
 tau_tar = 5 * dt;          % computation cycle, constant  will  change force magnitude
-lambda_tar = 1 / tau_tar;   % atractor lamda
+%lambda_tar = 1 / tau_tar;   % atractor lamda
+lambda_tar = 5;
 Q = 0.05;                   % base for gaussian noise
 
 
 [~,rob_W,rob_L,theta_obs] = vehicle.get_RobotCharacteristics();
 
 %beta_1 = 1/lambda_tar;
-beta_1 = 50;
-beta_2 = 30;
+beta_1 = 20;
+beta_2 = 100;
 
 itarget = TARGET1;
 ZTARGET = 2;
@@ -373,7 +373,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
             theta0 = atan2((YTARGET - y_cm), (XTARGET - x_cm)) - phi;
         
-            armJoints(1) = theta0 + pi;
+            armJoints(1) =  theta0 + pi;
             error = vehicle.set_joints(armJoints); % in rad  
   
             j = ReadArmJoints;
@@ -390,7 +390,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
                 armJoints(4) = angles(3);
                 error = vehicle.set_joints(armJoints); % in rad  
 
-                result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack/10);
+                result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack);
                 if result1 == OK
                     action = PICK;
                 end
@@ -401,6 +401,23 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     if action == PICK
         pause(1);
         vehicle.close_hand();
+        sim.trigger_simulation();
+
+
+        armJoints(2)=30*pi/180;
+        armJoints(3)=50*pi/180;
+        armJoints(4)=70*pi/180;
+        armJoints(5)=0*pi/180;
+        error = vehicle.set_joints(armJoints); % in rad  
+
+        result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack/2);
+        if result1 == OK
+            armJoints(1)=0;
+            error = vehicle.set_joints(armJoints); % in rad  
+            itarget = TARGET2;
+            vrobot_x = 100;
+            action = MOVE;
+        end
     end
 
     
