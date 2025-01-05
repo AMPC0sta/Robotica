@@ -410,7 +410,6 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         if result1 == OK
             armJoints(1)=0;
             error = vehicle.set_joints(armJoints); % in rad  
-            vrobot_x = CRUISE_VELOCITY;
             disp('Press any key to terminate...');
             pause;
             disp('Terminated!');
