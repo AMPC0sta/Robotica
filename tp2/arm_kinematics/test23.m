@@ -12,7 +12,7 @@ qmax = [1.3090,     2.2864,    1.7802];
 p = DirKin_planar_3DOF(arm_joints,L);
 disp(p);
 
-[error, angle] = InvKin_planar_3DOF_geo(p,L,-1,qmin,qmax,-pi/2);
+[error, angle] = InvKin_planar_3DOF_geo(p,L,1,qmin,qmax,pi/2);
 
 disp(rad2deg(angle));
 
