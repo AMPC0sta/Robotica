@@ -410,11 +410,13 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         if result1 == OK
             armJoints(1)=0;
             error = vehicle.set_joints(armJoints); % in rad  
-            disp('Press any key to terminate...');
-            pause;
-            disp('Terminated!');
-            break;
-
+            result2  = is_movement_complete(armJoints,ReadArmJoints,joints_slack/2);
+            if result2 == OK
+                disp('Press any key to terminate...');
+                pause;
+                disp('Terminated!');
+                break;
+            end
         end
     end
     
