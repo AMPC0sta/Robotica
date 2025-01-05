@@ -368,19 +368,25 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     if action == GRASP
         [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
             theta0 = atan2((YTARGET - y_cm), (XTARGET - x_cm)) - phi;
-
-            th0 = theta0 + pi;
-            armJoints(1) = th0;
+        
+            armJoints(1) = theta0 + pi;
             error = vehicle.set_joints(armJoints); % in rad  
   
-            j = vehicle.get_joints();
+            j = ReadArmJoints;
+            fprintf('th0:%f\n',armJoints(1));
+            fprintf('j(1):%f\n',j(1));
+            fprintf('abs:%f\n',abs(armJoints(1) - j(1)));
 
-            if abs(th0 - j(1)) <= 0.01
+            if abs(armJoints-(1) - j(1)) >= 0.05
+                wait = 0;
+            else
+                %pause(5);
                 armJoints(2) = angles(1);
                 armJoints(3) = angles(2);
                 armJoints(4) = angles(3);
                 error = vehicle.set_joints(armJoints); % in rad  
             end
+            
     end
 
     
