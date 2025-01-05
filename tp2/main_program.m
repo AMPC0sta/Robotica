@@ -429,7 +429,19 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         end
     end
 
-    
+    if action == DROP
+        pause(1);
+        vehicle.open_hand();
+        sim.trigger_simulation();
+        hand = OPENED_HAND;
+        
+        armJoints(1)=30*pi/180;
+        armJoints(2)=30*pi/180;
+        armJoints(3)=50*pi/180;
+        armJoints(4)=70*pi/180;
+        armJoints(5)=0*pi/180;
+        error = vehicle.set_joints(armJoints); % in rad  
+    end
     
     graphic_dynamics_view = 0;
     if graphic_dynamics_view == 1        
