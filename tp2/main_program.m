@@ -158,7 +158,7 @@ wrobot = 0;
 dt = 0.05;
 tau_tar = 5 * dt;          % computation cycle, constant  will  change force magnitude
 %lambda_tar = 1 / tau_tar;   % atractor lamda
-lambda_tar = 5;
+lambda_tar = 2;
 Q = 0.05;                   % base for gaussian noise
 
 

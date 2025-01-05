@@ -11,7 +11,6 @@ function R = is_movement_complete(set_joints, read_joints, tolerance)
     for ptr = 1:length(set_joints)
         if abs(set_joints(ptr) - read_joints(ptr)) >= tolerance
             acc = acc + 1;
-            disp(acc);
         else
             wait = 0;
         end
