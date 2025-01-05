@@ -389,7 +389,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             armJoints(1)=0;
             error = vehicle.set_joints(armJoints); % in rad  
             itarget = TARGET2;
-            vrobot_x = 100;
+            vrobot_x = CRUISE_VELOCITY;
             action = MOVE;
         end
     end
@@ -400,12 +400,19 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         sim.trigger_simulation();
         hand = OPENED_HAND;
         
-        armJoints(1)=30*pi/180;
         armJoints(2)=30*pi/180;
         armJoints(3)=50*pi/180;
         armJoints(4)=70*pi/180;
         armJoints(5)=0*pi/180;
-        error = vehicle.set_joints(armJoints); % in rad  
+        error = vehicle.set_joints(armJoints); % in rad                                 two phase movement, phase_1 => Lift, phase_2 => XY re-orientation
+
+        result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack/2);
+        if result1 == OK
+            armJoints(1)=0;
+            error = vehicle.set_joints(armJoints); % in rad  
+            vrobot_x = CRUISE_VELOCITY;
+            break;
+        end
     end
     
     graphic_dynamics_view = 0;
