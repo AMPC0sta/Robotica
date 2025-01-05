@@ -165,7 +165,7 @@ Q = 0.05;                   % base for gaussian noise
 [~,rob_W,rob_L,theta_obs] = vehicle.get_RobotCharacteristics();
 
 %beta_1 = 1/lambda_tar;
-beta_1 = 20;
+beta_1 = 10;
 beta_2 = 100;
 
 itarget = TARGET1;

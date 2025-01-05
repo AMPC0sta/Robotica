@@ -10,7 +10,6 @@ function R = is_movement_complete(set_joints, read_joints, tolerance)
     R = NOK;
     for ptr = 1:length(set_joints)
         if abs(set_joints(ptr) - read_joints(ptr)) >= tolerance
-            disp(abs(set_joints(ptr) - read_joints(ptr)));
             acc = acc + 1;
             disp(acc);
         else
