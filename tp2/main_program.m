@@ -304,7 +304,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     if action == MOVE
         [~,XTARGET,YTARGET] = sim.get_TargetPosition(itarget);
         psi_tar = atan2 ((YTARGET - y),(XTARGET - x));
-«       distance_robot_2_target = sqrt((XTARGET-x)^2+(YTARGET-y)^2);
+        distance_robot_2_target = sqrt((XTARGET-x)^2+(YTARGET-y)^2);
 
         f_tar = target_aquisition(phi,psi_tar,lambda_tar);
         delta_theta = theta_obs(2) - theta_obs(1); %sector width in radians
