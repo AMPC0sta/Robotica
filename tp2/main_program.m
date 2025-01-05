@@ -180,17 +180,21 @@ disp(L);
 disp(q_min);
 disp(q_max);
 
-TARGET_BOUNDARY_HIGH = 100 * (Links(5) + Links(6) + Links(7) + Links(8));
-TARGET_BOUNDARY_LOW = 10;
+
+joints_slack = 0.01;
 
 MOVE = 1;
 GRASP = 2;
 PICK = 3;
 action = MOVE;
 
+OK = 0;
+NOK = 1;
+
 
 addpath('D:\Projects\personal\Robotica\Robotica\tp2\arm_kinematics');
 addpath('D:\Projects\personal\Robotica\Robotica\tp2\navigation_dynamics');
+addpath('D:\Projects\personal\Robotica\Robotica\tp2\auxiliaries');
 
 %%%---------------------- Start Robot Motion Behavior -------------------
 while itarget<=sim.TARGET_Number % until robot goes to last target
@@ -377,16 +381,25 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             fprintf('j(1):%f\n',j(1));
             fprintf('abs:%f\n',abs(armJoints(1) - j(1)));
 
-            if abs(armJoints-(1) - j(1)) >= 0.05
-                wait = 0;
-            else
+            result  = is_movement_complete(armJoints,ReadArmJoints,joints_slack);
+            if result == OK && action == GRASP 
                 %pause(5);
+                arm_position = OK;
                 armJoints(2) = angles(1);
                 armJoints(3) = angles(2);
                 armJoints(4) = angles(3);
                 error = vehicle.set_joints(armJoints); % in rad  
+                
+                result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack/10);
+                if result1 == OK && arm_position == OK
+                    action = PICK;
+                end
             end
-            
+    end
+
+    if action == PICK
+        pause(1);
+        vehicle.close_hand();
     end
 
     
