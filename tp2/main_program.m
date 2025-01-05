@@ -186,8 +186,13 @@ joints_slack = 0.01;
 MOVE = 1;
 GRASP = 2;
 PICK = 3;
-action = MOVE;
+DROP = 4;
 
+OPENED_HAND = 1000;
+CLOSED_HAND = 1001;
+
+action = MOVE;
+hand = OPENED_HAND;
 OK = 0;
 NOK = 1;
 
@@ -391,8 +396,12 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
                 error = vehicle.set_joints(armJoints); % in rad  
 
                 result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack);
-                if result1 == OK
+                if result1 == OK && hand == OPENED_HAND
                     action = PICK;
+                end
+
+                if result1 == OK && hand == CLOSED_HAND
+                    action = DROP;
                 end
  
             end
@@ -402,7 +411,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         pause(1);
         vehicle.close_hand();
         sim.trigger_simulation();
-
+        hand = CLOSED_HAND;
 
         armJoints(2)=30*pi/180;
         armJoints(3)=50*pi/180;
