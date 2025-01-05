@@ -17,4 +17,3 @@ disp(p);
 disp(rad2deg(angle));
 
 p1 = DirKin_planar_3DOF(angle,L);
-disp(p1);

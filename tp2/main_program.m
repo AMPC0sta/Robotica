@@ -389,13 +389,12 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
                 armJoints(3) = angles(2);
                 armJoints(4) = angles(3);
                 error = vehicle.set_joints(armJoints); % in rad  
-                
-                %result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack/10);
-                pe = DirKin_planar_3DOF(armJoints,L);
 
-                if pe(1) == xed && pe(2) == zed
+                result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack/10);
+                if result1 == OK
                     action = PICK;
                 end
+ 
             end
     end
 
