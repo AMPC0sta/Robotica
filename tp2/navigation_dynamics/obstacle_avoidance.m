@@ -1,4 +1,18 @@
 function [f_obstacle] = obstacle_avoidance(delta_theta,theta_obs,beta_1,beta_2,dist,rob_L,rob_W)
+% function type: Navigation Dynamics
+% 
+% Objective: Determine obstacles directions and repulsive forces to it.
+% 
+% Input:
+%       delta_theta     - Angle of one LIDAR sector 
+%       theta_obs       - LIDAR angles for each slice.
+%       beta_1          - Obstacle avoidance parameter (maximum repulsive force)
+%       beta_2          - Obstacle avoidance parameter (where repulsion starts to act on the robot)
+%       dist            - LIDAR readings
+%       rob_L           - Robot lenght
+%       rob_W           - Robot width
+% Output
+%       f_target        - Repulsive force to obstacles
 
     lambda_obs_i = beta_1 * exp(-dist/beta_2);
 

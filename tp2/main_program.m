@@ -148,55 +148,59 @@ itarget=BOX;          %initialize first target
 start = tic;
 iteration = 0;
 
-% Initializations out of loop:
-vrobot_x = 100;
+
+% Our initializations code here:
+% This don't need to be inside the loop
+CRUISE_VELOCITY = 100;
+KINEMATICS_VELOCITY =30;
+
+vrobot_x = CRUISE_VELOCITY;
 vrobot_y = 0;
 wrobot = 0;
 
 %dt = sim.get_simulation_time();
     
 dt = 0.05;
-tau_tar = 5 * dt;          % computation cycle, constant  will  change force magnitude
-%lambda_tar = 1 / tau_tar;   % atractor lamda
-lambda_tar = 2;
+tau_tar = 5 * dt;           % computation cycle, constant  will  change force magnitude
+lambda_tar = 2;             % small attractive force, to ensure repulsion is much higher
 Q = 0.05;                   % base for gaussian noise
 
 
 [~,rob_W,rob_L,theta_obs] = vehicle.get_RobotCharacteristics();
 
-%beta_1 = 1/lambda_tar;
-beta_1 = 10;
-beta_2 = 100;
+beta_1 = 10;               % repulsion higher than attraction
+beta_2 = 100;              % As longest as repulsion is felt, as smooth is the path. However, to long will reach the walls.
 
-itarget = TARGET1;
-ZTARGET = 2;
+itarget = TARGET1;         % set first target
+ZTARGET = 2;               % box has 2 cm height
 
-L = [Links(5)*100,Links(6)*100,(Links(7)+Links(8))*100];
-q_max = [MaxPositionJoint(2),MaxPositionJoint(3),MaxPositionJoint(4)];
+L = [Links(5)*100,Links(6)*100,(Links(7)+Links(8))*100];                    % Planar 3DOF links lenght, converted from m to cm (x100)
+q_max = [MaxPositionJoint(2),MaxPositionJoint(3),MaxPositionJoint(4)];      % Planar 3DOF joints bounds
 q_min = [MinPositionJoint(2),MinPositionJoint(3),MinPositionJoint(4)];
+ARM_LENGHT = (Links(5) + Links(6) + Links(7) + Links(8)) * 100;             % maximum lenght arm can reach if scratched
 
-disp(Links);
-disp(L);
-disp(q_min);
-disp(q_max);
+joints_slack = 0.01;        % tolerance for joints slacks;
 
-
-joints_slack = 0.01;
-
+% State machine to rule the operation, MOVE -> GRASP -> PICK -> MOVE -> GRASP -> DROP
 MOVE = 1;
 GRASP = 2;
 PICK = 3;
 DROP = 4;
 
+% State od the hand
 OPENED_HAND = 1000;
 CLOSED_HAND = 1001;
 
-action = MOVE;
-hand = OPENED_HAND;
-OK = 0;
+RIGHT = 1;                  % elbows
+LEFT = -1;
+
+action = MOVE;              % Status of the state machine, start operation in movement (reaching target1)
+hand = OPENED_HAND;         % Status of the state machine, start operation with opened hand
+
+OK = 0;                     % alias for human code reading (turn reading more natural)
 NOK = 1;
 
-
+% Modularity, adding each "module" paths
 addpath('D:\Projects\personal\Robotica\Robotica\tp2\arm_kinematics');
 addpath('D:\Projects\personal\Robotica\Robotica\tp2\navigation_dynamics');
 addpath('D:\Projects\personal\Robotica\Robotica\tp2\auxiliaries');
@@ -296,69 +300,35 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     end
     
     %%----------- BEGIN YOUR CODE HERE ----------- %
-
-    % %Send values to arm joints
-    % armJoints(1)=180*pi/180;  
-    % armJoints(2)=60*pi/180;
-    % armJoints(3)=70*pi/180;
-    % armJoints(4)=50*pi/180;
-    % armJoints(5)=0*pi/180;
-    % %This function send value for arm Joints in rad
-    % error = vehicle.set_joints(armJoints); % in rad
-    % %Input
-    % %armJoints - Array with the new values to be applied to the arm joints
-    % %Output:
-    % %error = 1 - error in function
-    % if error == 1
-    %    sim.terminate();
-    %    return;
-    % end
-
-    % %Functions that allows open/close the hand
-    %error = vehicle.open_hand(); 
-    %error = vehicle.close_hand(); 
-    % %Output:
-    % %error = 1 - error in function
-    %if error == 1
-    %    sim.terminate();
-    %    return;
-    %end
-
-    
-
-
  
     if action == MOVE
         [~,XTARGET,YTARGET] = sim.get_TargetPosition(itarget);
         psi_tar = atan2 ((YTARGET - y),(XTARGET - x));
+«       distance_robot_2_target = sqrt((XTARGET-x)^2+(YTARGET-y)^2);
 
-        distance_robot_2_target = sqrt((XTARGET-x)^2+(YTARGET-y)^2);
-
-        %f_tar = - lambda_tar * sin(phi - psi_tar);
         f_tar = target_aquisition(phi,psi_tar,lambda_tar);
-        
         delta_theta = theta_obs(2) - theta_obs(1); %sector width in radians
-        %[~,dist] = vehicle.get_DistanceSensorAquisition(true, false);
         f_obs = obstacle_avoidance(delta_theta,theta_obs,beta_1,beta_2,dist,rob_L,rob_W);
         f_stoch = sqrt(Q) * randn(1,1);     % randn returns a 1x1 matrix with probability around a guassian distribution
+
         f_total = f_obs + f_tar + f_stoch;
         wrobot = f_total;
     
         x_cm = x + 15.4*cos(phi);
         y_cm = y + 15.4*sin(phi);
-        z_cm = 25.015;
-        alpha = 190*pi/180; 
+
+        z_cm = 25.015;              % Z box position
+        alpha = 190*pi/180;         % arm orientation
+
         distance_arm_target = sqrt((XTARGET-x_cm)^2 + (YTARGET-y_cm)^2);
 
-    
-        if distance_arm_target > 10 && distance_arm_target < 60
-            vrobot_x = 20;
-            xed = sqrt( (XTARGET-x_cm)^2 + (YTARGET-y_cm)^2);
+        if distance_arm_target > 10 && distance_arm_target < ARM_LENGHT             % if distance inside a certain area, reduce velocity
+            vrobot_x = KINEMATICS_VELOCITY;
+            xed = sqrt( (XTARGET-x_cm)^2 + (YTARGET-y_cm)^2);                       % transforms center of robot to arm base
             zed = ZTARGET-z_cm;
 
             try
-                %[error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
-                [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
+                [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,RIGHT,q_min,q_max,alpha);      % do inverse kinematics while in move until one solution os possible.
             catch ME
                 disp(ME.message);
                 error = 1;
@@ -374,28 +344,23 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     end
 
 
-    if action == GRASP
-        [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,1,q_min,q_max,alpha);
-            theta0 = atan2((YTARGET - y_cm), (XTARGET - x_cm)) - phi;
+    if action == GRASP 
+        [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,RIGHT,q_min,q_max,alpha);              % Re-get the solution
+            theta0 = atan2((YTARGET - y_cm), (XTARGET - x_cm)) - phi;                               % align arm orientation to the target ( although in most scenarios wrobot != 0 before stoping ensure arm orientation firs joint will be pi)
         
             armJoints(1) =  theta0 + pi;
-            error = vehicle.set_joints(armJoints); % in rad  
+            error = vehicle.set_joints(armJoints); % in rad                                         % two phase movement: phase_1 => XY orientation, phase_2 XZ position (to ensure arm doesnt demage the robot itself)
   
             j = ReadArmJoints;
-            fprintf('th0:%f\n',armJoints(1));
-            fprintf('j(1):%f\n',j(1));
-            fprintf('abs:%f\n',abs(armJoints(1) - j(1)));
-
             result  = is_movement_complete(armJoints,ReadArmJoints,joints_slack);
             if result == OK && action == GRASP 
-                %pause(5);
                 arm_position = OK;
                 armJoints(2) = angles(1);
                 armJoints(3) = angles(2);
                 armJoints(4) = angles(3);
                 error = vehicle.set_joints(armJoints); % in rad  
 
-                result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack);
+                result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack);              % is robot picking the box? or dropping it?
                 if result1 == OK && hand == OPENED_HAND
                     action = PICK;
                 end
@@ -417,7 +382,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         armJoints(3)=50*pi/180;
         armJoints(4)=70*pi/180;
         armJoints(5)=0*pi/180;
-        error = vehicle.set_joints(armJoints); % in rad  
+        error = vehicle.set_joints(armJoints); % in rad                                 two phase movement, phase_1 => Lift, phase_2 => XY re-orientation
 
         result1  = is_movement_complete(armJoints,ReadArmJoints,joints_slack/2);
         if result1 == OK
