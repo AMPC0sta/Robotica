@@ -25,6 +25,8 @@ yed=pe(2);
 
 x3 = xed - L(3)*sin(alpha3);
 y3 = yed - L(3)*cos(alpha3);
+%x3 = xed - L(3)*cos(alpha3);
+%y3 = yed - L(3)*sin(alpha3);
 
 %Now this turned on the 2DOF Inv Kin problem
 [error,qout] = InvKin_planar_2DOF_geo([x3,y3],[L(1),L(2)], S, [qmin(1),qmin(2)], [qmax(1),qmax(2)]);

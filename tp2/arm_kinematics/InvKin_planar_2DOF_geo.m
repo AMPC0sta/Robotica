@@ -18,7 +18,7 @@ function [error_inv_kin, q]=InvKin_planar_2DOF_geo(pe,L, S, qmin, qmax)
 
 %Your code here:
 
-error_inv_kin =0;
+error_inv_kin = 0;
 %desired coordinates for the end-effector position
 xed=pe(1);
 yed=pe(2);
@@ -33,18 +33,19 @@ if arg1 >=-1 && arg1 <=1
    beta1 = acos(arg1);
 else
    error_inv_kin = 1; %#ok<*NASGU>
-   error('Não há solucao para Theta1!');
+   error('There is no solution for Theta1!');
 end    
 
 %Theta_1 is bound the Y axis intead of X, due to join1 which is vertical,
 %here we change it's quadrant
 if S==1
    %Theta_1 = pi/2 - (alfa1-beta1);   % Elbow right
-   Theta_1 = alfa1-beta1;
+   T_1 = alfa1-beta1;
 elseif S==-1
    %Theta_1 = pi/2 - (alfa1+beta1);   % Elbow left  
-   Theta_1 = (beta1 + alfa1);
+   T_1 = (beta1 + alfa1);
 end
+Theta_1 = T_1;
 
 % ------ Compute Theta_2:
 arg2 = (L(1)^2+L(2)^2-r^2)/(2*L(1)*L(2));
@@ -60,12 +61,12 @@ elseif S==-1
    Theta_2 = -(pi-beta2);   % Elbow left  
 end
 
-% check if Theta_1 is outside joint limits
-if (Theta_1 < qmin(1) || Theta_1 > qmax(1))
-    error_inv_kin = 1;
-    error('Theta1 is outside joint limits!');
-end
 
+% check if Theta_1 is outside joint limits
+if (Theta_1 < qmin(1)|| Theta_1 > qmax(1))
+   error_inv_kin = 1;
+   error('Theta1 is outside joint limits!');
+end
 
 % check if Theta_2 is outside joint limits
 if (Theta_2 < qmin(2) || Theta_2 > qmax(2))
