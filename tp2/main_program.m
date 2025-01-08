@@ -340,6 +340,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             if error == 0  && action == MOVE
                 action = GRASP;
                 vrobot_x = 0;
+                wrobot = 0;
             end
 
         end
@@ -378,7 +379,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
 
     if action == PICK
         %pause(1);
-        wrobot = 0;
+
         vehicle.close_hand();
         sim.trigger_simulation();
         hand = CLOSED_HAND;
