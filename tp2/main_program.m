@@ -161,14 +161,15 @@ wrobot = 0;
     
 dt = 0.05;
 tau_tar = 5 * dt;           % computation cycle, constant  will  change force magnitude
-lambda_tar = 2;             % small attractive force, to ensure repulsion is much higher
-Q = 0.05;                   % base for gaussian noise
 
+
+lambda_tar = 2;             % small attractive force, to ensure repulsion is much higher
+beta_1 = 10;               % repulsion higher than attraction
+beta_2 = 100;              % As longest as repulsion is felt, as smooth is the path. However, to long will reach the walls.
+Q = 0.05;                   % base for gaussian noise
 
 [~,rob_W,rob_L,theta_obs] = vehicle.get_RobotCharacteristics();
 
-beta_1 = 10;               % repulsion higher than attraction
-beta_2 = 100;              % As longest as repulsion is felt, as smooth is the path. However, to long will reach the walls.
 
 itarget = TARGET1;         % set first target
 ZTARGET = 2;               % box has 2 cm height
@@ -344,6 +345,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             if error == 0  && action == MOVE
                 action = GRASP;
                 vrobot_x = 0;
+                wrobot = 0;
             end
 
         end
@@ -361,7 +363,6 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             j = ReadArmJoints;
             result  = is_movement_complete(armJoints,ReadArmJoints,joints_slack);
             if result == OK && action == GRASP 
-                wrobot = 0;
                 arm_position = OK;
                 armJoints(2) = angles(1);
                 armJoints(3) = angles(2);
@@ -430,10 +431,8 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         end
     end
     
-    disp(vrobot_x);
-    disp(wrobot);
     
-    graphic_dynamics_view = OK;
+    graphic_dynamics_view = NOK;
     if graphic_dynamics_view == OK && iteration > 2
         phi_range = linspace(-2*pi,2*pi,25);
         ylim([-2,20]);
@@ -443,6 +442,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
 
             f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
             f_obs_1 = obstacle_avoidance_with_phi(phi_range,delta_theta,theta_obs,beta_1,beta_2,dist,rob_W,rob_L);
+            
             f_t = f_obs_1 + f_tar_1 + f_stoch;
             
             h_f_t = plot(phi_range,f_t, 'g');

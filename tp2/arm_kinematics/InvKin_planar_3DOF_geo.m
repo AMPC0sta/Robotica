@@ -15,8 +15,8 @@ function [error_inv_kin, q]=InvKin_planar_3DOF_geo(pe,L, S, qmin, qmax, alpha3)
 %       q               - Joints position
 error_inv_kin = 0;
 
-x3 = pe(1); - L(3)*cos(alpha3);
-y3 = pe(2); - L(3)*sin(alpha3);
+x3 = pe(1) - L(3)*cos(alpha3);
+y3 = pe(2) - L(3)*sin(alpha3);
 
 %Now this turned on the 2DOF Inv Kin problem
 [error,qout] = InvKin_planar_2DOF_geo([x3,y3],[L(1),L(2)], S, [qmin(1),qmin(2)], [qmax(1),qmax(2)]);
