@@ -9,7 +9,7 @@ function [error, pe]=DirKin_planar_3DOF(qinput,L,qmin,qmax)
 
 error = 0;
 
-for ptr = 1:length(qinput)
+for ptr = 1:length(qinput)          % error if angles beyond joints limits
 
     if qinput(ptr) > qmax(ptr) || qinput(ptr) < qmin(ptr)
         error = 1;   
