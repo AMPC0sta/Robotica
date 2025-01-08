@@ -148,11 +148,10 @@ itarget=BOX;          %initialize first target
 start = tic;
 iteration = 0;
 
-
 % Our initializations code here:
 % This don't need to be inside the loop
 CRUISE_VELOCITY = 100;
-KINEMATICS_VELOCITY =30;
+KINEMATICS_VELOCITY = 30;
 
 vrobot_x = CRUISE_VELOCITY;
 vrobot_y = 0;
@@ -179,6 +178,8 @@ q_max = [MaxPositionJoint(2),MaxPositionJoint(3),MaxPositionJoint(4)];      % Pl
 q_min = [MinPositionJoint(2),MinPositionJoint(3),MinPositionJoint(4)];
 ARM_LENGHT = (Links(5) + Links(6) + Links(7) + Links(8)) * 100;             % maximum lenght arm can reach if scratched
 
+DISTANCE_BTW_RCTR_ACTR = 15.4;                                              % distance between center of the robot and center of joint 2 (when joint1 is pi)
+
 joints_slack = 0.01;        % tolerance for joints slacks;
 
 % State machine to rule the operation, MOVE -> GRASP -> PICK -> MOVE -> GRASP -> DROP
@@ -199,6 +200,8 @@ hand = OPENED_HAND;         % Status of the state machine, start operation with 
 
 OK = 0;                     % alias for human code reading (turn reading more natural)
 NOK = 1;
+
+graphics_init = NOK;
 
 % Modularity, adding each "module" paths
 addpath('D:\Projects\personal\Robotica\Robotica\tp2\arm_kinematics');
@@ -314,8 +317,9 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         f_total = f_obs + f_tar + f_stoch;
         wrobot = f_total;
     
-        x_cm = x + 15.4*cos(phi);
-        y_cm = y + 15.4*sin(phi);
+        DISTANCE_BTW_RCTR_ACTR = 15.4;
+        x_cm = x + DISTANCE_BTW_RCTR_ACTR * cos(phi);
+        y_cm = y + DISTANCE_BTW_RCTR_ACTR * sin(phi);
 
         z_cm = 25.015;              % Z box position
         alpha = 190*pi/180;         % arm orientation
@@ -340,7 +344,6 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             if error == 0  && action == MOVE
                 action = GRASP;
                 vrobot_x = 0;
-                wrobot = 0;
             end
 
         end
@@ -427,7 +430,53 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         end
     end
     
-    graphic_dynamics_view = 0;
+    disp(vrobot_x);
+    disp(wrobot);
+    
+    graphic_dynamics_view = OK;
+    if graphic_dynamics_view == OK && iteration > 2
+        phi_range = linspace(-2*pi,2*pi,25);
+        ylim([-2,20]);
+        if graphics_init == NOK
+            graphics_init = OK;
+            %phi_range = linspace(-2*pi,2*pi,25);
+
+            f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
+            f_obs_1 = obstacle_avoidance_with_phi(phi_range,delta_theta,theta_obs,beta_1,beta_2,dist,rob_W,rob_L);
+            f_t = f_obs_1 + f_tar_1 + f_stoch;
+            
+            h_f_t = plot(phi_range,f_t, 'g');
+            %lgd.TextColor = 'black';  % Set a default color for all entries if desired
+            hold on
+            
+            h_f_tar = plot(phi_range,f_tar_1, 'b', 'LineWidth', 2);
+            h_f_obs = plot(phi_range,f_obs_1, 'r', 'LineWidth', 2);
+
+            h_phi_line = xline(phi, 'b--', 'LineWidth', 2); % Creates a vertical line at each value in phi, in red color
+            
+            % Add labels and title
+            xlabel('Phi (radians)');
+            ylabel('f_{tar} (Value)');
+            title('Robot Motion Navigation Dynamics');
+    
+            lgd = legend("\color{Green}Total Force without stochastic force", "\color{Blue}Target Acquisition contribution", "\color{Red}Obstacle avoidance contribution");
+    
+            % Set colors for each legend entry
+           
+    
+        else
+            f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
+            f_obs_1 = obstacle_avoidance_with_phi(phi_range,delta_theta,theta_obs,beta_1,beta_2,dist,rob_W,rob_L);
+            f_t = f_obs_1 + f_tar_1 + f_stoch;
+
+            % Update plot data
+            set(h_f_t, 'YData', f_t);
+            set(h_phi_line, 'Value', phi);
+            set(h_f_tar, 'YData', f_tar_1);
+            set(h_f_obs, 'YData', f_obs_1);
+        end
+    end        
+    %{
     if graphic_dynamics_view == 1        
             phi_range = linspace(-2*pi,2*pi,25);
             f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
@@ -462,7 +511,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             lgd.String = {'\color{blue} Total Force without stochastic force','\color{blue} Current phi angle', '\color{green} Target Acquisition contribution','\color{red} Obstacle avoidance contribution'};
     
     end 
-
+    %}
 
     %%------------- END OF YOUR CODE -------------
     

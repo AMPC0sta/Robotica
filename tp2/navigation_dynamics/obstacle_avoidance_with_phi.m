@@ -26,12 +26,12 @@ function [f_obstacle] = obstacle_avoidance_with_phi(phi,delta_theta,theta_obs,be
         part = 0;
         for i = 1:11
             angle = phi(ptr) - psi(i);
-            disp(angle);
+            %disp(angle);
             f_component_i = lambda_obs_i(i) * angle * exp((-angle^2)./(2*(sigma_i(i))^2));
             part = part + f_component_i;
         end
        
         tmp_f_obstacle(ptr) = part;
     end
-    disp (tmp_f_obstacle);
+    %disp (tmp_f_obstacle);
     f_obstacle = tmp_f_obstacle;
