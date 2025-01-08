@@ -14,7 +14,7 @@ armJoints = [deg2rad(-30),deg2rad(-30),deg2rad(-30)];
 
 disp(p);
 
-[error, angle] = InvKin_planar_3DOF_geo(p,L,-1,qmin,qmax,pi/2);
+[error, angle] = InvKin_planar_3DOF_geo(p,L,-1,qmin,qmax,-pi/2);
 
 disp(rad2deg(angle));
 
