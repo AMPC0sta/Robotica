@@ -476,43 +476,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             set(h_f_obs, 'YData', f_obs_1);
         end
     end        
-    %{
-    if graphic_dynamics_view == 1        
-            phi_range = linspace(-2*pi,2*pi,25);
-            f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
-           
-            f_obs_1 = obstacle_avoidance_with_phi(phi_range,delta_theta,theta_obs,beta_1,beta_2,dist,rob_W,rob_L);
-           
-            f_t = f_obs_1 + f_tar_1 + f_stoch;
-            ylim([-10,45]);
-
-            
-            plot(phi_range,f_t, 'b', 'LineWidth', 2);
-            %plot(phi_range,f_t, 'b',phi_range,f_tar_1, 'g', phi_range,f_obs_1, 'r', 'LineWidth', 2);
-            hold on
-                %plot(phi, f_obs +  target_aquisition(phi,psi_tar,lambda_tar) + f_stoch, 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r'); % Red point
-                xline(phi, '--b', 'LineWidth', 2); % Creates a vertical line at each value in phi, in red color
-                plot(phi_range,f_tar_1, 'g', 'LineWidth', 2);
-                plot(phi_range,f_obs_1, 'r', 'LineWidth', 2);
-            hold off
-            
-            % Add labels and title
-            xlabel('Phi (radians)');
-            ylabel('f_{tar} (Value)');
-            title('Robot Motion Navigation Dynamics');
-    
-            lgd = legend("Total Force without stochastic force", "-- Current phi angle","Target Acquisition contribution", "Obstacle avoidance contribution");
-    
-            % Set colors for each legend entry
-            lgd.TextColor = 'black';  % Set a default color for all entries if desired
-    
-            % Adjust individual colors (MATLAB does not natively support different colors in a single legend, 
-            % but you can create custom colored legend icons if needed)
-            lgd.String = {'\color{blue} Total Force without stochastic force','\color{blue} Current phi angle', '\color{green} Target Acquisition contribution','\color{red} Obstacle avoidance contribution'};
-    
-    end 
-    %}
-
+   
     %%------------- END OF YOUR CODE -------------
     
     %%----------------------------------------------------------------------
