@@ -23,17 +23,18 @@ error_inv_kin = 0;
 xed=pe(1);
 yed=pe(2);
 
-x3 = xed - L(3)*sin(alpha3);
-y3 = yed - L(3)*cos(alpha3);
-%x3 = xed - L(3)*cos(alpha3);
-%y3 = yed - L(3)*sin(alpha3);
+
+%x3 = xed - L(3)*sin(alpha3);
+%y3 = yed - L(3)*cos(alpha3);
+x3 = xed - L(3)*cos(alpha3);
+y3 = yed - L(3)*sin(alpha3);
 
 %Now this turned on the 2DOF Inv Kin problem
 [error,qout] = InvKin_planar_2DOF_geo([x3,y3],[L(1),L(2)], S, [qmin(1),qmin(2)], [qmax(1),qmax(2)]);
 Theta_3 = alpha3 - qout(1) - qout(2);
 
 
-if (Theta_3 <= qmin(3) || Theta_3 >= qmax(3))
+if (Theta_3 <= qmin(3)  || Theta_3 >= qmax(3) )
    error_inv_kin = 1;
    error('Theta3 is outside joint limits!');
 end

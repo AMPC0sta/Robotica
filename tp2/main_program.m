@@ -328,7 +328,10 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             zed = ZTARGET-z_cm;
 
             try
-                [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,RIGHT,q_min,q_max,alpha);      % do inverse kinematics while in move until one solution os possible.
+                %[error, angles] = InvKin_planar_3DOF_geo([xed zed],L,RIGHT,q_min,q_max,alpha);      % do inverse kinematics while in move until one solution os possible.
+                p = rotx(pi) * rotz(-pi/2) * [xed zed 0]';
+                disp(p);
+                [error, angles] = InvKin_planar_3DOF_geo([p(1) p(2)],L,RIGHT,q_min,q_max,alpha);      % do inverse kinematics while in move until one solution os possible.
             catch ME
                 disp(ME.message);
                 error = 1;
@@ -337,7 +340,6 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             if error == 0  && action == MOVE
                 action = GRASP;
                 vrobot_x = 0;
-                wrobot = 0;
             end
 
         end
@@ -345,7 +347,8 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
 
 
     if action == GRASP 
-        [error, angles] = InvKin_planar_3DOF_geo([xed zed],L,RIGHT,q_min,q_max,alpha);              % Re-get the solution
+        %[error, angles] = InvKin_planar_3DOF_geo([xed zed],L,RIGHT,q_min,q_max,alpha);             % Re-get the solution
+            [error, angles] = InvKin_planar_3DOF_geo([p(1) p(2)],L,RIGHT,q_min,q_max,alpha);        % Re-get the solution
             theta0 = atan2((YTARGET - y_cm), (XTARGET - x_cm)) - phi;                               % align arm orientation to the target ( although in most scenarios wrobot != 0 before stoping ensure arm orientation firs joint will be pi)
         
             armJoints(1) =  theta0 + pi;
@@ -354,6 +357,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             j = ReadArmJoints;
             result  = is_movement_complete(armJoints,ReadArmJoints,joints_slack);
             if result == OK && action == GRASP 
+                wrobot = 0;
                 arm_position = OK;
                 armJoints(2) = angles(1);
                 armJoints(3) = angles(2);
@@ -373,7 +377,8 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     end
 
     if action == PICK
-        pause(1);
+        %pause(1);
+        wrobot = 0;
         vehicle.close_hand();
         sim.trigger_simulation();
         hand = CLOSED_HAND;
@@ -395,7 +400,8 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     end
 
     if action == DROP
-        pause(1);
+        %pause(1);
+        wrobot = 0;
         vehicle.open_hand();
         sim.trigger_simulation();
         hand = OPENED_HAND;

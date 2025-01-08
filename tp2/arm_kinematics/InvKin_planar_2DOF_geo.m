@@ -24,8 +24,8 @@ xed=pe(1);
 yed=pe(2);
 
 % ------ Compute Theta_1:
-%alfa1 = atan2(yed,xed);
-alfa1 = atan2(xed,yed);
+alfa1 = atan2(yed,xed);
+%alfa1 = atan2(xed,yed);
 r = sqrt(xed^2 + yed^2);
 arg1 = (r^2+L(1)^2-L(2)^2)/(2*L(1)*r);
 
@@ -40,12 +40,12 @@ end
 %here we change it's quadrant
 if S==1
    %Theta_1 = pi/2 - (alfa1-beta1);   % Elbow right
-   T_1 = alfa1-beta1;
+   Theta_1 = alfa1-beta1;
 elseif S==-1
    %Theta_1 = pi/2 - (alfa1+beta1);   % Elbow left  
-   T_1 = (beta1 + alfa1);
+   Theta_1 = (beta1 + alfa1);
 end
-Theta_1 = T_1;
+
 
 % ------ Compute Theta_2:
 arg2 = (L(1)^2+L(2)^2-r^2)/(2*L(1)*L(2));
