@@ -177,7 +177,7 @@ ZTARGET = 2;               % box has 2 cm height
 L = [Links(5)*100,Links(6)*100,(Links(7)+Links(8))*100];                    % Planar 3DOF links lenght, converted from m to cm (x100)
 q_max = [MaxPositionJoint(2),MaxPositionJoint(3),MaxPositionJoint(4)];      % Planar 3DOF joints bounds
 q_min = [MinPositionJoint(2),MinPositionJoint(3),MinPositionJoint(4)];
-ARM_LENGHT = (Links(5) + Links(6) + Links(7) + Links(8)) * 100;             % maximum lenght arm can reach if scratched
+ARM_LENGHT = (Links(5) + Links(6) + Links(7) + Links(8)) * 100;             % maximum lenght arm can reach if streched
 
 DISTANCE_BTW_RCTR_ACTR = 15.4;                                              % distance between center of the robot and center of joint 2 (when joint1 is pi)
 
@@ -432,7 +432,7 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
     end
     
     
-    graphic_dynamics_view = NOK;
+    graphic_dynamics_view = OK;
     if graphic_dynamics_view == OK && iteration > 2
         phi_range = linspace(-2*pi,2*pi,25);
         ylim([-2,20]);

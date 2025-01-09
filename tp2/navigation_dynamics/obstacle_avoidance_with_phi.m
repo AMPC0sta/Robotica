@@ -21,14 +21,12 @@ function [f_obstacle] = obstacle_avoidance_with_phi(phi,delta_theta,theta_obs,be
         lambda_obs_i(i) = beta_1 * exp(-dist(i)/beta_2); %#ok<*AGROW>
         sigma_i(i) = atan(tan(delta_theta/2)+((rob_W/2)/(rob_L/2+dist(i))));
     end
-    disp(theta_obs);
     for ptr = 1:length(phi)
         psi = phi(ptr) + theta_obs;
         part = 0;
         for i = 1:length(lambda_obs_i)
-            angle = phi(ptr) - psi(i);
-            
-            f_component_i = lambda_obs_i(i) * angle * exp((angle^2)./(2*(sigma_i(i))^2));
+            angle = phi(ptr) - psi(i);   
+            f_component_i = lambda_obs_i(i) * angle * exp((-angle^2)/(2*(sigma_i(i))^2));
             part = part + f_component_i;
         end
 
