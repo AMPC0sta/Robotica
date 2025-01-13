@@ -438,20 +438,14 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
         ylim([-2,20]);
         if graphics_init == NOK
             graphics_init = OK;
-            %phi_range = linspace(-2*pi,2*pi,25);
-
             f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
             f_obs_1 = obstacle_avoidance_with_phi(phi_range,delta_theta,theta_obs,beta_1,beta_2,dist,rob_W,rob_L);
-            
-            f_t = f_obs_1 + f_tar_1 + f_stoch;
-            
+                        f_t = f_obs_1 + f_tar_1 + f_stoch;
             h_f_t = plot(phi_range,f_t, 'g');
-            %lgd.TextColor = 'black';  % Set a default color for all entries if desired
             hold on
             
             h_f_tar = plot(phi_range,f_tar_1, 'b', 'LineWidth', 2);
             h_f_obs = plot(phi_range,f_obs_1, 'r', 'LineWidth', 2);
-
             h_phi_line = xline(phi, 'b--', 'LineWidth', 2); % Creates a vertical line at each value in phi, in red color
             
             % Add labels and title
@@ -460,10 +454,6 @@ while itarget<=sim.TARGET_Number % until robot goes to last target
             title('Robot Motion Navigation Dynamics');
     
             lgd = legend("\color{Green}Total Force without stochastic force", "\color{Blue}Target Acquisition contribution", "\color{Red}Obstacle avoidance contribution");
-    
-            % Set colors for each legend entry
-           
-    
         else
             f_tar_1 = target_aquisition(phi_range,psi_tar,lambda_tar);
             f_obs_1 = obstacle_avoidance_with_phi(phi_range,delta_theta,theta_obs,beta_1,beta_2,dist,rob_W,rob_L);
